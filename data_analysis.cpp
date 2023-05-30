@@ -10,21 +10,41 @@ Double_t myFunction(Double_t *x, Double_t *par)
     Double_t I0 = par[0];
     Double_t D = par[1];
     Double_t d = par[2];
-    Double_t theta = x[0];
+    Double_t X = x[0];
+
+    const double l = 78.4 * TMath::Power(10, 4);
 
     const double_t k = 2 * TMath::Pi() / 640; // 640 nm
 
-    Double_t arg1 = 0.5 * k * D * TMath::Sin(theta);
-    Double_t arg2 = 0.5 * k * d * TMath::Sin(theta);
+    Double_t arg1 = 0.5 * k * D * TMath::Sin(X / d);
+    Double_t arg2 = 0.5 * k * d * TMath::Sin(X / d);
 
     Double_t result = I0 * TMath::Power(TMath::Cos(arg1), 2) * TMath::Power(TMath::Sin(arg2) / arg2, 2);
 
     return result;
 }
 
+Double_t myFunction2(Double_t *x, Double_t *par)
+{
+    Double_t I0 = par[0];
+    Double_t D = par[1];
+    Double_t d = par[2];
+    Double_t X = x[0];
+
+    const double l = 78.4 * TMath::Power(10,4) ;
+
+    const double_t k = 2 * TMath::Pi() / 640; // 640 nm
+
+    Double_t arg1 = 0.5 * k * D * sin(X / d);
+    Double_t arg2 = 0.5 * k * d * sin(X / d);
+
+    Double_t result = I0 * TMath::Power(cos(arg1), 2) * TMath::Power(sin(arg2) / arg2, 2);
+
+    return result;
+}
+
 void analysis()
 {
-
     // Lettura del file di dati
     TGraph *g1 = new TGraph("Data1.txt", "%lg %lg");
     TH1 *h1 = g1->GetHistogram();
@@ -50,10 +70,19 @@ void analysis()
     TGraph *gI_0 = new TGraph("I_0.txt", "%lg%lg");
     TH1 *hI_0 = gI_0->GetHistogram();
 
-    // Definizione della funzione, setting parametri par[0] = I0; par[1] = D ; par[2] = d
+    // valore I_0
+    TF1 *fI_0 = new TF1("fI_0", "gaus", 0, 10000);
 
-    TF1 *f1 = new TF1("f1", myFunction, 0, 20000, 3);
-    f1->SetParameters(10, 300, 100);
+    gI_0->Fit(fI_0);
+    Double_t mean = fI_0->GetParameter(0);
+
+    // Definizione delle funzioni, setting parametri par[0] = I0; par[1] = D ; par[2] = d
+
+    TF1 *f1 = new TF1("f1", myFunction, 50000, 70000, 3);
+    f1->SetParameters(mean, 300, 100);
+
+    TF1 *f1c = new TF1("f1c", myFunction2, 50000, 70000, 3);
+    f1->SetParameters(mean, 300, 100);
 
     TF1 *f2 = new TF1("f2", myFunction, 0, 20000, 3);
     f2->SetParameters(10, 300, 150);
@@ -64,10 +93,6 @@ void analysis()
     TF1 *f5 = new TF1("f5", myFunction, 0, 20000, 3);
     f1->SetParameters(10, 500, 150);
 
-    TH1 *htot[4] = {h1, h2, h4, h5};
-    TF1 *ftot[4] = {f1, f2, f4, f5};
-
     TCanvas *c = new TCanvas("canvas", "Grafico");
-
-    gI_0->Draw();
+    f1c->Draw();
 }
