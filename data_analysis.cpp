@@ -31,14 +31,14 @@ Double_t myFunction2(Double_t *x, Double_t *par)
     Double_t d = par[2];
     Double_t X = x[0];
 
-    const double l = 78.4 * TMath::Power(10,4) ;
+    const double l = 78.4 * TMath::Power(10, 4);
 
     const double_t k = 2 * TMath::Pi() / 640; // 640 nm
 
-    Double_t arg1 = 0.5 * k * D * sin(X / d);
-    Double_t arg2 = 0.5 * k * d * sin(X / d);
+    Double_t arg1 = 0.5 * k * D * TMath::Sin(X / d);
+    Double_t arg2 = 0.5 * k * d * TMath::Sin(X / d);
 
-    Double_t result = I0 * TMath::Power(cos(arg1), 2) * TMath::Power(sin(arg2) / arg2, 2);
+    Double_t result = I0 * TMath::Power(TMath::Cos(arg1), 2) * TMath::Power(TMath::Sin(arg2) / arg2, 2);
 
     return result;
 }
@@ -78,11 +78,11 @@ void analysis()
 
     // Definizione delle funzioni, setting parametri par[0] = I0; par[1] = D ; par[2] = d
 
-    TF1 *f1 = new TF1("f1", myFunction, 50000, 70000, 3);
+    TF1 *f1 = new TF1("f1", myFunction, 60000, 70000, 3);
     f1->SetParameters(mean, 300, 100);
 
-    TF1 *f1c = new TF1("f1c", myFunction2, 50000, 70000, 3);
-    f1->SetParameters(mean, 300, 100);
+    TF1 *f1c = new TF1("f1c", myFunction2, 60000, 70000, 3);
+    f1c->SetParameters(10, 300, 100);
 
     TF1 *f2 = new TF1("f2", myFunction, 0, 20000, 3);
     f2->SetParameters(10, 300, 150);
@@ -94,5 +94,7 @@ void analysis()
     f1->SetParameters(10, 500, 150);
 
     TCanvas *c = new TCanvas("canvas", "Grafico");
-    f1c->Draw();
+    
+    g1->Fit(f1,"R");
+    g1->Draw();
 }
