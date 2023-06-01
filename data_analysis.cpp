@@ -10,14 +10,15 @@ Double_t myFunction(Double_t *x, Double_t *par)
     Double_t I0 = par[0];
     Double_t D = par[1];
     Double_t d = par[2];
+    Double_t p=par[3];
     Double_t X = x[0];
 
-    const double l = 78.4 * TMath::Power(10, 4);
+    const double l = 78.4 * TMath::Power(10, 4);  //micron
 
-    const double_t k = 2 * TMath::Pi() / 640; // 640 nm
+    const double_t k = 2 * TMath::Pi() / 0.633 ; //  micron
 
-    Double_t arg1 = 0.5 * k * D * TMath::Sin(X / d);
-    Double_t arg2 = 0.5 * k * d * TMath::Sin(X / d);
+    Double_t arg1 = 0.5 * k * D * TMath::Sin (X /l + p);
+    Double_t arg2 = 0.5 * k * d * TMath::Sin(X /l + p);
 
     Double_t result = I0 * TMath::Power(TMath::Cos(arg1), 2) * TMath::Power(TMath::Sin(arg2) / arg2, 2);
 
@@ -33,10 +34,10 @@ Double_t myFunction2(Double_t *x, Double_t *par)
 
     const double l = 78.4 * TMath::Power(10, 4);
 
-    const double_t k = 2 * TMath::Pi() / 640; // 640 nm
+    const double_t k = 2 * TMath::Pi() / 0.633  ; // micron
 
-    Double_t arg1 = 0.5 * k * D * TMath::Sin(X / d);
-    Double_t arg2 = 0.5 * k * d * TMath::Sin(X / d);
+    Double_t arg1 = 0.5 * k * D * TMath::Sin(X / l);
+    Double_t arg2 = 0.5 * k * d * TMath::Sin(X / l);
 
     Double_t result = I0 * TMath::Power(TMath::Cos(arg1), 2) * TMath::Power(TMath::Sin(arg2) / arg2, 2);
 
@@ -78,8 +79,8 @@ void analysis()
 
     // Definizione delle funzioni, setting parametri par[0] = I0; par[1] = D ; par[2] = d
 
-    TF1 *f1 = new TF1("f1", myFunction, 60000, 70000, 3);
-    f1->SetParameters(mean, 300, 100);
+    TF1 *f1 = new TF1("f1", myFunction, 60000, 68000,4);
+    f1->SetParameters(mean, 300, 100, 0.08);
 
     TF1 *f1c = new TF1("f1c", myFunction2, 60000, 70000, 3);
     f1c->SetParameters(10, 300, 100);
