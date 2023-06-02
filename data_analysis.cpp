@@ -109,4 +109,6 @@ void analysis()
 
         g1->SetPoint(i, x, y);
     }
+       g1->Fit(f1, "R");
+    g1->Draw("AP")
 }
