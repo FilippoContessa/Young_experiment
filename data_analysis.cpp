@@ -10,52 +10,15 @@ Double_t myFunction(Double_t *x, Double_t *par)
     Double_t I0 = par[0];
     Double_t D = par[1];
     Double_t d = par[2];
+    Double_t x_0 = par[3];
     Double_t X = x[0];
 
     const double l = 78.4 * TMath::Power(10, 4); // micron
 
     const double_t k = 2 * TMath::Pi() / 0.633; //  micron
 
-    Double_t arg1 = 0.5 * k * D * TMath::Sin(X / l);
-    Double_t arg2 = 0.5 * k * d * TMath::Sin(X / l);
-
-    Double_t result = I0 * TMath::Power(TMath::Cos(arg1), 2) * TMath::Power(TMath::Sin(arg2) / arg2, 2);
-
-    return result;
-}
-
-Double_t myFunction2(Double_t *x, Double_t *par)
-{
-    Double_t D = par[0];
-    Double_t d = par[1];
-    Double_t X = x[0];
-
-    const double l = 78.4 * TMath::Power(10, 4);
-    const double I0 = 2.5;
-
-    const double_t k = 2 * TMath::Pi() / 0.633; // micron
-
-    Double_t arg1 = 0.5 * k * D * TMath::Sin(X / l);
-    Double_t arg2 = 0.5 * k * d * TMath::Sin(X / l);
-
-    Double_t result = I0 * TMath::Power(TMath::Cos(arg1), 2) * TMath::Power(TMath::Sin(arg2) / arg2, 2);
-
-    return result;
-}
-
-Double_t myFunction3(Double_t *x, Double_t *par)
-{
-    Double_t D = par[0];
-
-    Double_t X = x[0];
-
-    const double l = 78.4 * TMath::Power(10, 4);
-    const double I0 = 2.5;
-    const double d = 100;
-    const double_t k = 2 * TMath::Pi() / 0.633; // micron
-
-    Double_t arg1 = 0.5 * k * D * TMath::Sin(X / l);
-    Double_t arg2 = 0.5 * k * d * TMath::Sin(X / l);
+    Double_t arg1 = 0.5 * k * D * TMath::Sin((X-x_0) / l);
+    Double_t arg2 = 0.5 * k * d * TMath::Sin((X-x_0) / l);
 
     Double_t result = I0 * TMath::Power(TMath::Cos(arg1), 2) * TMath::Power(TMath::Sin(arg2) / arg2, 2);
 
@@ -97,6 +60,8 @@ void analysis()
     Int_t shiftValue; 
     
     // g1 shift
+
+    /*
     numPoints= g1->GetN();
     shiftValue= 63400;
     for (int i = 0; i < numPoints; i++)
@@ -109,7 +74,7 @@ void analysis()
         g1->SetPoint(i, x, y);
     }
     // g1R shift
-    numPoints= g1R->GetN();
+   numPoints= g1R->GetN();
     shiftValue= 63400;
     for (int i = 0; i < numPoints; i++)
     {
@@ -194,7 +159,6 @@ void analysis()
         g5G->SetPoint(i, x, y);
     }
     // valore I_0
-    /*
         TF1 *fI_0 = new TF1("fI_0", "gaus", 0, 10000);
         gI_0->Fit(fI_0);
         Double_t mean = fI_0->GetParameter(0);
@@ -202,14 +166,14 @@ void analysis()
 
     // Definizione delle funzioni, setting parametri par[0] = I0; par[1] = D ; par[2] = d
 
-    TF1 *f1 = new TF1("f1", myFunction, -4000, 4000, 3);
-    f1->SetParameters(2.5, 300, 100);
-    f1->SetParLimits(0, 2, 3);
-    f1->SetParLimits(1, 300, 301);
-    f1->SetParLimits(2, 99, 101);
+    TF1 *f1 = new TF1("f1", myFunction, 52000, 77000, 4);
+    f1->SetParameters(2.26, 300, 100,63400);
+   //  f1->SetParLimits(0, 2, 3);
+    //  f1->SetParLimits(1, 300, 301);
+    // f1->SetParLimits(2, 99, 101);
 
-    TF1 *f2 = new TF1("f2", myFunction, -4500, 4500, 3);
-    f2->SetParameters(4.7, 300, 150);
+    TF1 *f2 = new TF1("f2", myFunction, 52000,77000 , 4);
+    f2->SetParameters(4.7, 300, 150,63400);
 
     TF1 *f4 = new TF1("f4", myFunction, -5000, 5000, 3);
     f4->SetParameters(0.6, 250, 150);
@@ -227,7 +191,13 @@ void analysis()
     f5_100x->SetParameters(4.7, 500, 150);
 
     TCanvas *c = new TCanvas("canvas", "Grafico");
-    g1R->Fit(f1,"R");
-    g1R->Draw();
+   
+   
+   
+   g1R->Fit(f1,"R");
 
+   g1R->Draw("APL");
+   // f1->SetLineColor(kRed);
+   // f1->Draw("Lsame");
+    
 }
