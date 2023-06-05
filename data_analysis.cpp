@@ -68,6 +68,10 @@ void analysis()
     TGraph *g1 = new TGraph("Data1.txt", "%lg %lg");
     TH1 *h1 = g1->GetHistogram();
 
+
+    TGraphErrors *g1R = new TGraphErrors("Data1R.txt", "%lg %lg %*lg %lg");
+    TH1 *h1R = g1R->GetHistogram();
+
     TGraph *g2 = new TGraph("Data2.txt", "%lg%lg");
     TH1 *h2 = g2->GetHistogram();
 
@@ -104,6 +108,19 @@ void analysis()
 
         g1->SetPoint(i, x, y);
     }
+    // g1R shift
+    numPoints= g1R->GetN();
+    shiftValue= 63400;
+    for (int i = 0; i < numPoints; i++)
+    {
+        double x, y;
+        g1R->GetPoint(i, x, y);
+
+        x -= shiftValue;
+
+        g1R->SetPoint(i, x, y);
+    }
+
     // g2 shift
     numPoints = g2->GetN();
     shiftValue = 64200;
@@ -210,5 +227,7 @@ void analysis()
     f5_100x->SetParameters(4.7, 500, 150);
 
     TCanvas *c = new TCanvas("canvas", "Grafico");
+    g1R->Fit(f1,"R");
+    g1R->Draw();
 
 }
